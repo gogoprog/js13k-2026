@@ -6,6 +6,7 @@ compile:
 build: compile
 	mkdir -p build
 	cat src/before.html > build/index.html
+	cat deps/w.min.full.js >> build/index.html
 	cat temp/main.js >> build/index.html
 	cat src/after.html >> build/index.html
 
@@ -16,9 +17,6 @@ minify:
 
 retail: compile
 	mkdir -p build
-	cat src/before.html > build/index.html
-	cat temp/main.js >> build/index.html
-	cat src/after.html >> build/index.html
 	rm -rf retail
 	mkdir -p retail
 	# terser --compress unsafe_arrows=true,unsafe=true,toplevel=true,passes=8 --mangle --mangle-props --toplevel --ecma 6 -O ascii_only=true -- temp/main.js > temp/main.min.js
@@ -26,8 +24,11 @@ retail: compile
 	# terser --compress toplevel=true,passes=2 --ecma 6 -O ascii_only=true -- temp/main.js > temp/main.min.js
 	# cp temp/main.js temp/main.min.js
 	# regpack temp/main.min.js > temp/main.min.regpack.js
-	# cat src/before.html temp/main.min.regpack.js src/after.html | tr -d '\n' > retail/index.html
-	cat src/before.html temp/main.min.js src/after.html > retail/index.html
+	cat src/before.html > retail/index.html
+	cat deps/w.min.full.js >> retail/index.html
+	echo "" >> retail/index.html
+	cat temp/main.min.js >> retail/index.html
+	cat src/after.html >> retail/index.html
 	stat retail/index.html | grep Size
 
 zip: retail

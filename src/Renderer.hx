@@ -227,7 +227,8 @@ class Renderer {
     }
 
     inline static public function createText(text, width, height, ?bgcolor) {
-        var textCtx = cast(js.Browser.document.createElement("canvas"), js.html.CanvasElement).getContext("2d");
+        var canvas:js.html.CanvasElement = cast js.Browser.document.createElement("canvas");
+        var textCtx:js.html.CanvasRenderingContext2D = cast canvas.getContext("2d");
         textCtx.canvas.width  = width;
         textCtx.canvas.height = height;
         textCtx.font = "20px monospace";

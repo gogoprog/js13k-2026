@@ -1,6 +1,5 @@
 package;
 
-// var data = Macros.getFileContent("data/Castle_Tower.obj");
 var mapGen:map.Generator = new map.Generator();
 var map:map.Map;
 var triangles = new Array<math.Triangle>();
