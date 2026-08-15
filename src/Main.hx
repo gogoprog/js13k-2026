@@ -11,7 +11,7 @@ function main() {
     untyped window.onblur = (e) -> { windowIsVisible = false; };
     // Renderer.init();
     Input.init();
-    // var buffer = World.load();
+    var buffer = World.load();
     // var worldModel = new ModelData(buffer);
     // var cross = ModelData.createQuad(0.01, 0.01);
     // cross.texture = Renderer.createText("+", 16, 16);
@@ -33,10 +33,15 @@ function main() {
         // Renderer.drawModel(cross, false);
         // Renderer.postRender();
         Input.update();
+        var backup = untyped window.setTimeout;
+        untyped window.setTimeout = function(a, b) { trace(a); trace(b); };
+
+        untyped window.requestAnimationFrame = function() { };
         W.reset(c);
-        W.camera({x:9, y:8, z:20, rx:-13, ry:15});
+        untyped window.setTimeout = backup;
+        W.camera({x:9, y:8, z:20, rx:-13, ry:15 });
         W.light({x:0.5, y:-1, z:-0.5});
-        W.cube({x:5, w:3, h:.5, d:.5, b:"f44"});
+        W.cube({x:5 + 10 * Math.sin(t * 1), w:3, h:.5, d:.5, b:"f44"});
         W.sphere({x:0, size:4, b:"388"});
         W.pyramid({x:-5, size:4, b:"909"});
         W.add("custom_model", {
@@ -54,7 +59,9 @@ function main() {
             ]
         });
         W.custom_model({x:1, y:5, z:-15, size:10});
-        js.Browser.window.requestAnimationFrame(loop);
+        W.draw(t * 1000, dt * 1000, 1);
+        // js.Browser.window.requestAnimationFrame(loop);
+        // untyped W._setTimeout(loop, 1000/60);
     }
     js.Browser.window.requestAnimationFrame(loop);
 }

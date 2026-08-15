@@ -10,7 +10,7 @@ class ModelSystem extends ecs.System {
 
     override public function updateEntity(e:ecs.Entity, dt:Float) {
         var model = e.get(Model);
-        Renderer.setModelPosition(e.position + model.offset);
-        Renderer.drawModel(model.modelData, model.worldSpace, e.scale, e.yaw, e.pitch);
+        // Renderer.setModelPosition(e.position + model.offset);
+        // Renderer.drawModel(model.modelData, model.worldSpace, e.scale, e.yaw, e.pitch);
     }
 }
