@@ -6,7 +6,7 @@ compile:
 build: compile
 	mkdir -p build
 	cat src/before.html > build/index.html
-	cat deps/w.min.full.js >> build/index.html
+	cat deps/w.full.min.js >> build/index.html
 	cat temp/main.js >> build/index.html
 	cat src/after.html >> build/index.html
 
@@ -25,7 +25,7 @@ retail: compile
 	# cp temp/main.js temp/main.min.js
 	# regpack temp/main.min.js > temp/main.min.regpack.js
 	cat src/before.html > retail/index.html
-	cat deps/w.min.full.js >> retail/index.html
+	cat deps/w.full.min.js >> retail/index.html
 	echo "" >> retail/index.html
 	cat temp/main.min.js >> retail/index.html
 	cat src/after.html >> retail/index.html
