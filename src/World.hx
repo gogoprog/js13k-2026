@@ -7,6 +7,7 @@ var map:map.Map;
 var triangles = new Array<math.Triangle>();
 
 class World {
+    inline static var scale = 10;
     inline static public function load():DataBuffer {
         var buffer = new DataBuffer(2048);
         var size = 1000;
@@ -68,7 +69,7 @@ class World {
     }
 
     inline static public function getCenter():math.Vector3 {
-        return [map.width*0.5, 0, map.height *0.5];
+        return [map.width*0.5, 0, map.height*0.5];
     }
 
     inline static public function getMap() {
@@ -79,11 +80,22 @@ class World {
         W.plane({size:10000, b:"3d2", y:0, rx:-90});
 
         for(w in map.walls) {
-            var a = new math.Vector2(w.x1, w.y1);
-            var b = new math.Vector2(w.x2, w.y2);
+            var a = new math.Vector2(w.x1, w.y1) * scale;
+            var b = new math.Vector2(w.x2, w.y2) * scale;
             var p = (a + b) * 0.5;
             var angle = new math.Vector2(w.x2 - w.x1, w.y2 - w.y1).getAngle() * 180/Math.PI;
-            W.cube({w:w.getLength(), d:0.1, h:1, x:p.x, z:p.y, ry:angle });
+            W.cube({w:w.getLength() * scale, d:0.1* scale, h:2 * scale, x:p.x, z:p.y, ry:angle,b:'888' });
         }
+    }
+
+    inline static public function setCamera(position:math.Vector3, yaw:Float, pitch:Float) {
+        W.camera({
+            x:position.x * scale,
+            y:position.y * scale,
+            z:position.z * scale,
+            ry:yaw * 180/3.1415,
+            rx:pitch * -180/3.1415
+
+        });
     }
 }

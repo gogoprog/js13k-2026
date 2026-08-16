@@ -16,10 +16,10 @@ function main() {
     // var cross = ModelData.createQuad(0.01, 0.01);
     // cross.texture = Renderer.createText("+", 16, 16);
     game.Game.init();
-
     W.init(c);
     function loop(t:Float) {
         W.reset();
+
         if(!windowIsVisible) {
             js.Browser.window.setTimeout(function() {loop(t+1);}, 1000);
             return;
@@ -30,11 +30,9 @@ function main() {
         lastTime = t;
         game.Game.update(dt);
         Input.update();
-
         World.render();
-
+        W.ambient(0.2);
         W.light({x:0.5, y:-1, z:-0.5});
-
         W.cube({x:5 + 10 * Math.sin(t * 1), w:3, h:.5, d:.5, b:"f44"});
         W.sphere({x:0, size:4, b:"388"});
         W.pyramid({x:-5, size:4, b:"909"});
