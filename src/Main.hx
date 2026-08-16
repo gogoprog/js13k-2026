@@ -19,6 +19,7 @@ function main() {
 
     W.init(c);
     function loop(t:Float) {
+        W.reset();
         if(!windowIsVisible) {
             js.Browser.window.setTimeout(function() {loop(t+1);}, 1000);
             return;
@@ -27,18 +28,13 @@ function main() {
         t /= 1000;
         var dt = t - lastTime;
         lastTime = t;
-        // Renderer.preRender();
-        // Renderer.setModelPosition(math.Vector3.zero);
-        // Renderer.drawModel(worldModel);
         game.Game.update(dt);
-        // Renderer.setModelPosition(new math.Vector3(0, 0, -0.5));
-        // Renderer.drawModel(cross, false);
-        // Renderer.postRender();
         Input.update();
 
-        W.reset();
-        W.camera({x:9, y:8, z:20, rx:-13, ry:15 });
+        World.render();
+
         W.light({x:0.5, y:-1, z:-0.5});
+
         W.cube({x:5 + 10 * Math.sin(t * 1), w:3, h:.5, d:.5, b:"f44"});
         W.sphere({x:0, size:4, b:"388"});
         W.pyramid({x:-5, size:4, b:"909"});

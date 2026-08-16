@@ -118,7 +118,7 @@ class PlayerSystem extends ecs.System {
             playerPosition[2] += pushDirection * 0.01;
         }
 
-        // Renderer.setCamera([playerPosition[0], playerPosition[1] + 0.4, playerPosition[2]], cameraYaw, cameraPitch);
+        Renderer.setCamera([playerPosition[0], playerPosition[1] + 0.4, playerPosition[2]], cameraYaw, cameraPitch);
     }
 
     static inline function checkCollision(x:Float, y:Float, z:Float):Bool {

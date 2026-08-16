@@ -1,5 +1,7 @@
 package;
 
+import w.W;
+
 var mapGen:map.Generator = new map.Generator();
 var map:map.Map;
 var triangles = new Array<math.Triangle>();
@@ -71,5 +73,17 @@ class World {
 
     inline static public function getMap() {
         return map;
+    }
+
+    inline static public function render() {
+        W.plane({size:10000, b:"3d2", y:0, rx:-90});
+
+        for(w in map.walls) {
+            var a = new math.Vector2(w.x1, w.y1);
+            var b = new math.Vector2(w.x2, w.y2);
+            var p = (a + b) * 0.5;
+            var angle = new math.Vector2(w.x2 - w.x1, w.y2 - w.y1).getAngle() * 180/Math.PI;
+            W.cube({w:w.getLength(), d:0.1, h:1, x:p.x, z:p.y, ry:angle });
+        }
     }
 }
