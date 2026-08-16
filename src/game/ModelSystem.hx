@@ -1,6 +1,7 @@
 package game;
 
 import ecs.Engine;
+import w.W;
 
 class ModelSystem extends ecs.System {
     public function new() {
@@ -12,5 +13,6 @@ class ModelSystem extends ecs.System {
         var model = e.get(Model);
         // Renderer.setModelPosition(e.position + model.offset);
         // Renderer.drawModel(model.modelData, model.worldSpace, e.scale, e.yaw, e.pitch);
+        World.renderModel(e.position, model);
     }
 }

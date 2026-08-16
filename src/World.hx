@@ -84,17 +84,37 @@ class World {
             var b = new math.Vector2(w.x2, w.y2) * scale;
             var p = (a + b) * 0.5;
             var angle = new math.Vector2(w.x2 - w.x1, w.y2 - w.y1).getAngle() * 180/Math.PI;
-            W.cube({w:w.getLength() * scale, d:0.1* scale, h:2 * scale, x:p.x, z:p.y, ry:angle,b:'888' });
+            W.cube({w:w.getLength() * scale, d:0.1* scale, h:2 * scale, x:p.x, z:p.y, ry:angle, b:'888' });
         }
     }
 
     inline static public function setCamera(position:math.Vector3, yaw:Float, pitch:Float) {
+        var p = position * scale;
         W.camera({
-            x:position.x * scale,
-            y:position.y * scale,
-            z:position.z * scale,
+            x:p.x,
+            y:p.y,
+            z:p.z,
             ry:yaw * 180/3.1415,
             rx:pitch * -180/3.1415
+
+        });
+        W.shotgun({
+            x:p.x,
+            y:p.y - 1.2,
+            z:p.z,
+            ry:yaw * 180/3.1415,
+            rx:pitch * -180/3.1415,
+            size:5
+        });
+    }
+
+    inline static public function renderModel(p:math.Vector3, model:game.Model) {
+        p = p * scale;
+        W.sphere({
+            x:p.x,
+            y:p.y,
+            z:p.z,
+            size:1
 
         });
     }
