@@ -85,39 +85,66 @@ W = {
       
       `#version 300 es
       precision highp float;                  // Set default float precision
-      in vec4 v_pos, v_col, v_uv, v_normal;   // Varyings received from the vertex shader: position, color, texture coordinates, normal (if any)
-      uniform vec3 light;                     // Uniform: light direction, smooth normals enabled
-      uniform vec4 o;                         // options [smooth, shading enabled, ambient, mix]
-      uniform vec2 uv_scale;
-      uniform sampler2D sampler;              // Uniform: 2D texture
-      out vec4 c;                             // Output: final fragment color
+      // in vec4 v_pos, v_col, v_uv, v_normal;   // Varyings received from the vertex shader: position, color, texture coordinates, normal (if any)
+      // uniform vec3 light;                     // Uniform: light direction, smooth normals enabled
+      // uniform vec4 o;                         // options [smooth, shading enabled, ambient, mix]
+      // uniform vec2 uv_scale;
+      // uniform sampler2D sampler;              // Uniform: 2D texture
+      // out vec4 c;                             // Output: final fragment color
 
-      // The code below displays colored / textured / shaded fragments
-      void main() {
-        c = mix(texture(sampler, v_uv.xy * uv_scale), v_col, o[3]);  // base color (mix of texture and rgba)
-        if(o[1] > 0.){                                    // if lighting/shading is enabled:
-          c = vec4(                                       // output = vec4(base color RGB * (directional shading + ambient light)), base color Alpha
-            c.rgb * (max(0., dot(light, -normalize(       // Directional shading: compute dot product of light direction and normal (0 if negative)
-              o[0] > 0.                                   // if smooth shading is enabled:
-              ? vec3(v_normal.xyz)                        // use smooth normals passed as varying
-              : cross(dFdx(v_pos.xyz), dFdy(v_pos.xyz))   // else, compute flat normal by making a cross-product with the current fragment and its x/y neighbours
-            )))
-            + o[2]),                                      // add ambient light passed as uniform
-            c.a                                           // use base color's alpha
-          );
-        }
-      }`
+      // // The code below displays colored / textured / shaded fragments
+      // void main() {
+      //   c = mix(texture(sampler, v_uv.xy * uv_scale), v_col, o.w);  // base color (mix of texture and rgba)
+      //   if(o.y > 0.){                                    // if lighting/shading is enabled:
+      //     c = vec4(                                       // output = vec4(base color RGB * (directional shading + ambient light)), base color Alpha
+      //       c.rgb * (max(0., dot(normalize(light), -normalize(       // Directional shading: compute dot product of light direction and normal (0 if negative)
+      //         o.x > 0.                                   // if smooth shading is enabled:
+      //         ? vec3(v_normal.xyz)                        // use smooth normals passed as varyinghighp 
+      //         : cross(dFdx(v_pos.xyz), dFdy(v_pos.xyz))   // else, compute flat normal by making a cross-product with the current fragment and its x/y neighbours
+      //       )))
+      //       + o.z),                                      // add ambient light passed as uniform
+      //       c.a                                           // use base color's alpha
+      //     );
+      //   }
+      // }
+      //
+in vec4 v_pos, v_col, v_uv, v_normal;
+uniform vec3 light;
+uniform vec4 o;
+uniform sampler2D sampler;
+out vec4 c;
+
+void main() {
+  vec3 n = normalize(cross(dFdx(v_pos.xyz), dFdy(v_pos.xyz)));
+  c = vec4(n * 0.5 + 0.5, 1.0);
+  // return;
+  c = mix(texture(sampler, v_uv.xy), v_col, o.w);
+  if (o.y > 0.0) {
+    vec3 n;
+    if (o.x > 0.0) {
+      n = v_normal.xyz;
+    } else {
+      n = cross(dFdx(v_pos.xyz), dFdy(v_pos.xyz));
+    }
+    // c = vec4(light, 1.0);
+    // c = vec4(normalize(n)*0.5 + 0.5, 1.0);
+    // return ;
+    float diffuse = max(0., dot(light, -normalize(n)));
+    c = vec4(c.rgb * (diffuse + o.z), c.a);
+  }
+}
+    `
     );
     
     // Compile the Fragment shader and attach it to the program
     W.gl.compileShader(shader);
     W.gl.attachShader(W.program, shader);
-    if(W.plugin.debug) console.log('fragment shader:', W.gl.getShaderInfoLog(shader) || 'OK');
+    if(W.plugin.debug || 1) console.log('fragment shader:', W.gl.getShaderInfoLog(shader) || 'OK');
     
     // Compile the program
     W.gl.linkProgram(W.program);
     W.gl.useProgram(W.program);
-    if(W.plugin.debug) console.log('program:', W.gl.getProgramInfoLog(W.program) || 'OK');
+    if(W.plugin.debug || 1) console.log('program:', W.gl.getProgramInfoLog(W.program) || 'OK');
     
     // Set the scene's background color (RGBA)
     W.gl.clearColor(1, 1, 1, 1);
@@ -215,6 +242,12 @@ W = {
       v.toFloat32Array(),
     );
 
+    // Transition the light's direction and send it to the shaders
+    W.gl.uniform3f(
+      W.gl.getUniformLocation(W.program, 'light'),
+      W.next.light.x, W.next.light.y, W.next.light.z
+    );
+
     // Clear canvas
     W.gl.clear(16640 /* W.gl.COLOR_BUFFER_BIT | W.gl.DEPTH_BUFFER_BIT */);
     
@@ -258,11 +291,6 @@ W = {
     // Disable alpha blending for the next frame
     W.gl.disable(3042 /* BLEND */);
     
-    // Transition the light's direction and send it to the shaders
-    W.gl.uniform3f(
-      W.gl.getUniformLocation(W.program, 'light'),
-      W.lerp('light','x'), W.lerp('light','y'), W.lerp('light','z')
-    );
   },
   
   // Render an object
@@ -320,7 +348,7 @@ W = {
         W.gl.bufferData(34962 /* ARRAY_BUFFER */, new Float32Array(model.vertices), 35044 /* STATIC_DRAW */);
 
         // Compute smooth normals if they don't exist yet (optional)
-        if (!model.normals && W.plugin.smooth) W.smooth(model);
+        if (!model.normals) W.smooth(model);
 
         // Make a buffer from the smooth/custom normals (if any)
         if (model.normals) {
@@ -366,7 +394,7 @@ W = {
         W.gl.getUniformLocation(W.program, 'o'), 
         
         // Enable smooth shading if "s" is true
-        object.s,
+        1.0,
         
         // Enable shading if in TRIANGLE* mode and object.ns disabled
         ((object.mode > 3) || (W.gl[object.mode] > 3)) && !object.ns ? 1 : 0,
@@ -377,7 +405,7 @@ W = {
         // Texture/color mix (if a texture is present. 0: fully textured, 1: fully colored)
         object.mix
       );
-      
+
       // If the object is a billboard: send a specific uniform to the shaders:
       // [width, height, isBillboard = 1, 0]
       W.gl.uniform4f(
