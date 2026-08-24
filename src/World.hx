@@ -1,6 +1,7 @@
 package;
 
 import w.W;
+import js.Browser.document;
 
 var mapGen:map.Generator = new map.Generator();
 var map:map.Map;
@@ -79,12 +80,12 @@ class World {
     inline static public function render() {
         W.plane({size:10000, b:"3d2", y:0, rx:-90});
 
-        for(w in map.walls) {
-            var a = new math.Vector2(w.x1, w.y1) * scale;
-            var b = new math.Vector2(w.x2, w.y2) * scale;
+        for(wi in map.walls) {
+            var a = new math.Vector2(wi.x1, wi.y1) * scale;
+            var b = new math.Vector2(wi.x2, wi.y2) * scale;
             var p = (a + b) * 0.5;
-            var angle = new math.Vector2(w.x2 - w.x1, w.y2 - w.y1).getAngle() * 180/Math.PI;
-            W.cube({w:w.getLength() * scale, d:0.1* scale, h:2 * scale, x:p.x, z:p.y, ry:angle, b:'888' });
+            var angle = (b-a).getAngle() * 180/Math.PI;
+            W.cube({w:wi.getLength() * scale, d:0.1* scale, h:2 * scale, x:p.x, z:p.y, ry:angle, t:untyped walloo});
         }
     }
 

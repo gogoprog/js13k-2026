@@ -6,7 +6,8 @@ compile:
 build: compile
 	mkdir -p build
 	cat src/before.html > build/index.html
-	cat deps/w.full.min.js >> build/index.html
+	# cat deps/w.full.min.js >> build/index.html
+	cat deps/w.js >> build/index.html
 	cat temp/main.js >> build/index.html
 	cat src/after.html >> build/index.html
 

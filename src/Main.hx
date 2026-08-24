@@ -130,23 +130,22 @@ function main() {
             0, 0, 1, 0, .5, 1,
         ]
     });
-    function loop(t:Float) {
+    function loop(_t:Float) {
         W.reset();
-
-        if(!windowIsVisible) {
-            js.Browser.window.setTimeout(function() {loop(t+1);}, 1000);
-            return;
-        }
-
-        t /= 1000;
-        var dt = t - lastTime;
-        lastTime = t;
+        // if(!windowIsVisible) {
+        //     js.Browser.window.setTimeout(function() {loop(_t+1);}, 1000);
+        //     return;
+        // }
+        _t /= 1000;
+        var dt = _t - lastTime;
+        lastTime = _t;
+        W.camera({z:4});
         game.Game.update(dt);
         Input.update();
         World.render();
         W.ambient(0.2);
         W.light({x:0.5, y:-1, z:-0.5});
-        W.draw(t);
+        W.draw(_t);
         js.Browser.window.requestAnimationFrame(loop);
     }
     js.Browser.window.requestAnimationFrame(loop);
