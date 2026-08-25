@@ -109,7 +109,8 @@ class World {
         });
     }
 
-    inline static public function renderModel(p:math.Vector3, model:game.Model) {
+    inline static public function renderModel(e:ecs.Entity, model:game.Model) {
+        var p = e.position;
         p = p * scale;
         // W.sphere({
         //     x:p.x,
@@ -121,6 +122,7 @@ class World {
             x:p.x,
             y:p.y,
             z:p.z,
+            ry: e.yaw,
             size:10
         });
     }

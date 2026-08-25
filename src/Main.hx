@@ -3,12 +3,14 @@ import w.W;
 import ecs.Engine;
 
 var lastTime = 0.0;
-var windowIsVisible = true;
+// var windowIsVisible = true;
 
 function main() {
     var c:js.html.CanvasElement = cast document.querySelector("canvas");
-    untyped window.onfocus = (e) -> { windowIsVisible = true; };
-    untyped window.onblur = (e) -> { windowIsVisible = false; };
+    // untyped window.onfocus = (e) -> { windowIsVisible = true; };
+    // untyped window.onblur = (e) -> { windowIsVisible = false; };
+    c.width = 1024;
+    c.height = 640;
     Input.init();
     var buffer = World.load();
     game.Game.init();

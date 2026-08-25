@@ -13,6 +13,6 @@ class ModelSystem extends ecs.System {
         var model = e.get(Model);
         // Renderer.setModelPosition(e.position + model.offset);
         // Renderer.drawModel(model.modelData, model.worldSpace, e.scale, e.yaw, e.pitch);
-        World.renderModel(e.position, model);
+        World.renderModel(e, model);
     }
 }
