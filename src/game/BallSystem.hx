@@ -16,7 +16,9 @@ class BallSystem extends ecs.System {
             move.time = 0;
             move.duration = 1 + Std.random(5);
             var speed = 2;
-            move.velocity = math.Vector3.getRotatedAroundY([1, 0, 0], Math.random() * Math.PI * 2) * speed;
+            var angle = Math.random() * 3.14 * 2;
+            move.velocity = math.Vector3.getRotatedAroundY([1, 0, 0], angle) * speed;
+            e.yaw = -angle * 180 / 3.14 + 90;
         }
     }
 }

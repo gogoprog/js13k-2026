@@ -276,7 +276,7 @@ W = {
 
       W.gl.uniform2f(
         W.gl.getUniformLocation(W.program, 'uv_scale'),
-        10, 1
+        10, 2
       );
     }
 
