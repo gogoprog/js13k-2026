@@ -111,12 +111,17 @@ class World {
 
     inline static public function renderModel(p:math.Vector3, model:game.Model) {
         p = p * scale;
-        W.sphere({
+        // W.sphere({
+        //     x:p.x,
+        //     y:p.y,
+        //     z:p.z,
+        //     size:1
+        // });
+        W.unicorn({
             x:p.x,
             y:p.y,
             z:p.z,
-            size:1
-
+            size:10
         });
     }
 }

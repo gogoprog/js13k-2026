@@ -56,10 +56,10 @@ W = {
       
       `#version 300 es
       precision highp float;                        // Set default float precision
-      in vec4 pos, col, uv, normal;                 // Vertex attributes: position, color, texture coordinates, normal (if any)
+      in vec4 pos, col, uv;                 // Vertex attributes: position, color, texture coordinates, normal (if any)
       uniform mat4 pv, eye, m, im;                  // Uniform transformation matrices: projection * view, eye, model, inverse model
       uniform vec4 bb;                              // If the current shape is a billboard: bb = [w, h, 1.0, 0.0]
-      out vec4 v_pos, v_col, v_uv, v_normal;        // Varyings sent to the fragment shader: position, color, texture coordinates, normal (if any)
+      out vec4 v_pos, v_col, v_uv;        // Varyings sent to the fragment shader: position, color, texture coordinates, normal (if any)
       void main() {                                 
         gl_Position = pv * (                        // Set vertex position: p * v * v_pos
           v_pos = bb.z > 0.                         // Set v_pos varying:
@@ -68,14 +68,12 @@ W = {
         );                                          
         v_col = col;                                // Set varyings 
         v_uv = uv;
-        v_normal = transpose(inverse(m)) * normal;  // recompute normals to match model thansformation
       }`
     );
     
     // Compile the Vertex shader and attach it to the program
     W.gl.compileShader(shader);
     W.gl.attachShader(W.program, shader);
-    if(W.plugin.debug) console.log('vertex shader:', W.gl.getShaderInfoLog(shader) || 'OK');
     
     // Create a Fragment shader
     // (This GLSL program is called for every fragment (pixel) of the scene)
@@ -85,7 +83,7 @@ W = {
       
       `#version 300 es
       precision highp float;                  // Set default float precision
-      in vec4 v_pos, v_col, v_uv, v_normal;   // Varyings received from the vertex shader: position, color, texture coordinates, normal (if any)
+      in vec4 v_pos, v_col, v_uv;   // Varyings received from the vertex shader: position, color, texture coordinates, normal (if any)
       uniform vec3 light;                     // Uniform: light direction, smooth normals enabled
       uniform vec4 o;                         // options [smooth, shading enabled, ambient, mix]
       uniform vec2 uv_scale;
@@ -97,7 +95,8 @@ W = {
         c = mix(texture(sampler, v_uv.xy * uv_scale), v_col, o.w);  // base color (mix of texture and rgba)
           c = vec4(                                       // output = vec4(base color RGB * (directional shading + ambient light)), base color Alpha
             c.rgb * (max(0., dot(normalize(light), -normalize(       // Directional shading: compute dot product of light direction and normal (0 if negative)
-               vec3(v_normal.xyz)                        // use smooth normals passed as varyinghighp 
+               // v             ec3(v_normal.xyz)                        // use smooth normals passed as varyinghighp 
+              cross(dFdx(v_pos.xyz), dFdy(v_pos.xyz)) 
             )))
             + o.z),                                      // add ambient light passed as uniform
             c.a                                           // use base color's alpha
@@ -109,12 +108,12 @@ W = {
     // Compile the Fragment shader and attach it to the program
     W.gl.compileShader(shader);
     W.gl.attachShader(W.program, shader);
-    if(W.plugin.debug || 1) console.log('fragment shader:', W.gl.getShaderInfoLog(shader) || 'OK');
+    // if(W.plugin.debug || 1) console.log('fragment shader:', W.gl.getShaderInfoLog(shader) || 'OK');
     
     // Compile the program
     W.gl.linkProgram(W.program);
     W.gl.useProgram(W.program);
-    if(W.plugin.debug || 1) console.log('program:', W.gl.getProgramInfoLog(W.program) || 'OK');
+    // if(W.plugin.debug || 1) console.log('program:', W.gl.getProgramInfoLog(W.program) || 'OK');
     
     // Set the scene's background color (RGBA)
     W.gl.clearColor(1, 1, 1, 1);
@@ -302,29 +301,15 @@ W = {
     );
 
     // Show warning if model doesn't exist (debug only)
-    if (W.plugin.debug && !model && !['camera','light','group'].includes(object.type)) {
-      console.warn(`tried to render model "${object.type}", which does not exist!`);
-    }
     
     // Don't render invisible items (camera, light, groups, camera's parent)
     if (model) {
 
       // Build the model's WebGL buffers if they don't exist yet
       if (model && !model.verticesBuffer) {
-        model.customNormals = !!model.normals;
-
         // Build the model's vertices buffer
         W.gl.bindBuffer(34962 /* ARRAY_BUFFER */, model.verticesBuffer = W.gl.createBuffer());
         W.gl.bufferData(34962 /* ARRAY_BUFFER */, new Float32Array(model.vertices), 35044 /* STATIC_DRAW */);
-
-        // Compute smooth normals if they don't exist yet (optional)
-        if (!model.normals) W.smooth(model);
-
-        // Make a buffer from the smooth/custom normals (if any)
-        if (model.normals) {
-          W.gl.bindBuffer(34962 /* ARRAY_BUFFER */, model.normalsBuffer = W.gl.createBuffer());
-          W.gl.bufferData(34962 /* ARRAY_BUFFER */, new Float32Array(model.normals.flat()), 35044 /* STATIC_DRAW */); 
-        }
 
         // Build the model's uv buffer (if any) if it doesn't exist yet
         if (model.uv) {
@@ -351,12 +336,6 @@ W = {
         W.gl.enableVertexAttribArray(buffer);
       }
       
-      // Set the normals buffer
-      if ( model.normalsBuffer) {
-        W.gl.bindBuffer(34962 /* ARRAY_BUFFER */, model.normalsBuffer);
-        W.gl.vertexAttribPointer(buffer = W.gl.getAttribLocation(W.program, 'normal'), 3, 5126 /* FLOAT */, false, 0, 0);
-        W.gl.enableVertexAttribArray(buffer);
-      }
       
       // Other options: [smooth, shading enabled, ambient light, texture/color mix]
       W.gl.uniform4f(
@@ -364,7 +343,7 @@ W = {
         W.gl.getUniformLocation(W.program, 'o'), 
         
         // Enable smooth shading if "s" is true
-        1.0,
+        0.0,
         
         // Enable shading if in TRIANGLE* mode and object.ns disabled
         ((object.mode > 3) || (W.gl[object.mode] > 3)) && !object.ns ? 1 : 0,
@@ -475,53 +454,13 @@ W = {
 // See "build.js" for which plugins are enabled in which verions.
 if (!W.built) {
   W.plugin = {
-    debug: true,
-    smooth: true,
+    debug: false,
+    smooth: false,
     builtinShapes: true,
   };
 }
 
 
-// Smooth normals computation plug-in (optional)
-// =============================================
-
-if (W.plugin.smooth) {
-  W.smooth = (model, dict = {}, vertices = [], vertexCount, i = 0, j, A, B, C, Ai, Bi, Ci, AB, BC, normal) => {
-
-    // Prepare smooth normals array
-    model.normals = [];
-
-    // Fill vertices array: [[x,y,z],[x,y,z]...]
-    for (; i < model.vertices.length; i += 3) {
-      vertices.push(model.vertices.slice(i, i+3));
-    }
-
-    // Get number of times to iterate
-    vertexCount = (model.indices || vertices).length;
-
-    // Iterate twice on the vertices
-    // - 1st pass: compute normals of each triangle and accumulate them for each vertex
-    // - 2nd pass: save the final smooth normals values
-    for (i = 0; i < vertexCount * 2; i += 3) {
-      j = i % vertexCount;
-
-      A = vertices[Ai = model.indices?.[j] ?? j];
-      B = vertices[Bi = model.indices?.[j+1] ?? j+1];
-      C = vertices[Ci = model.indices?.[j+2] ?? j+2];
-
-      AB = [B[0] - A[0], B[1] - A[1], B[2] - A[2]];
-      BC = [C[0] - B[0], C[1] - B[1], C[2] - B[2]];
-      normal = i > j ? [0,0,0] : [AB[1] * BC[2] - AB[2] * BC[1], AB[2] * BC[0] - AB[0] * BC[2], AB[0] * BC[1] - AB[1] * BC[0]];
-
-      dict[j = A.join()] ??= [0,0,0];
-      model.normals[Ai] = dict[j] = dict[j].map((a,i) => a + normal[i]);
-      dict[j = B.join()] ??= [0,0,0];
-      model.normals[Bi] = dict[j] = dict[j].map((a,i) => a + normal[i]);
-      dict[j = C.join()] ??= [0,0,0];
-      model.normals[Ci] = dict[j] = dict[j].map((a,i) => a + normal[i]);
-    }
-  };
-}
 
 
 // 3D models
