@@ -109,21 +109,63 @@ class World {
         });
     }
 
+    static public function makeParticleMesh():Array<Float> {
+        var verts:Array<Float> = [];
+        var latSteps = 9;
+        var lonSteps = 12;
+
+        function point(i:Int, j:Int):math.Vector3 {
+            var lat = Math.PI * i / latSteps;
+            var lon = Math.PI * 2 * j / lonSteps;
+            var nx = Math.sin(lat) * Math.cos(lon);
+            var ny = Math.cos(lat);
+            var nz = Math.sin(lat) * Math.sin(lon);
+            var r = 1
+                + 0.22 * Math.sin(lat * 3 + lon * 2) * Math.cos(lon * 2 - lat)
+                + 0.14 * Math.sin(lon * 4) * Math.sin(lat * 3 + 1)
+                + 0.10 * Math.cos(lat * 5 + lon);
+            return new math.Vector3(nx * r, ny * r, nz * r);
+        }
+
+        function addTri(a:math.Vector3, b:math.Vector3, c:math.Vector3) {
+            verts[verts.length] = a.x;
+            verts[verts.length] = a.y;
+            verts[verts.length] = a.z;
+            verts[verts.length] = b.x;
+            verts[verts.length] = b.y;
+            verts[verts.length] = b.z;
+            verts[verts.length] = c.x;
+            verts[verts.length] = c.y;
+            verts[verts.length] = c.z;
+        }
+
+        for(i in 0...latSteps) {
+            for(j in 0...lonSteps) {
+                var p00 = point(i, j);
+                var p01 = point(i, j + 1);
+                var p10 = point(i + 1, j);
+                var p11 = point(i + 1, j + 1);
+                addTri(p00, p10, p01);
+                addTri(p01, p10, p11);
+            }
+        }
+
+        return verts;
+    }
+
     inline static public function renderModel(e:ecs.Entity, model:game.Model) {
         var p = e.position;
         p = p * scale;
-        // W.sphere({
-        //     x:p.x,
-        //     y:p.y,
-        //     z:p.z,
-        //     size:1
-        // });
-        W.unicorn({
+        var s:Dynamic = {
             x:p.x,
             y:p.y,
             z:p.z,
             ry: e.yaw,
-            size:10
-        });
+            size:model.size
+        };
+        if(model.color != null) {
+            s.b = model.color;
+        }
+        untyped W[model.mesh](s);
     }
 }

@@ -193,6 +193,9 @@ function main() {
             0, 0, 1, 0, .5, 1,   0, 0, 1, 0, .5, 1,   0, 0, 1, 0, .5, 1,
         ]
     });
+    W.add("particle", {
+        vertices: World.makeParticleMesh()
+    });
     W.add("shotgun", {
         vertices: [
             // barrel (long thin box along z, sitting above the foregrip)

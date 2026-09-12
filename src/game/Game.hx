@@ -17,7 +17,10 @@ class Game {
 
     static public function spawnParticle(pos:math.Vector3) {
         var e = new ecs.Entity();
-        e.add(Model); //.modelData = Game.ballModel;
+        var m = e.add(Model);
+        m.mesh = "particle";
+        m.size = 1;
+        m.color = "f00";
         e.add(Particle).velocity = math.Vector3.getRotatedAroundY([0, 0, 1.5], Math.random() * Math.PI * 2);
         e.get(Particle).velocity.y = 1 + Math.random() * 2;
         e.position = [pos.x, pos.y, pos.z];
