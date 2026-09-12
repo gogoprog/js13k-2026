@@ -46,9 +46,9 @@ class InGameSystem extends ecs.System {
                     var e = new ecs.Entity();
                     e.add(Ball);
                     e.add(Model);
-                    e.get(Model).offset.y = -0.2;
+                    // e.get(Model).offset.y = -1.0;
                     var pos = zone.getCenter();
-                    e.position = [pos.x, 0.3, pos.y];
+                    e.position = [pos.x, 0.0, pos.y];
                     e.scale = 0.1;
                     e.pitch = 0;
                     engine.add(e);
