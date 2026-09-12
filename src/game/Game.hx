@@ -7,8 +7,13 @@ class Game {
         engine = new ecs.Engine();
         engine.enable(ModelSystem);
         engine.enable(MoveSystem);
-        engine.enable(MenuSystem);
+        // engine.enable(MenuSystem);
         engine.enable(ParticleSystem);
+        engine.enable(PlayerSystem);
+        engine.enable(PlayerGunSystem);
+        engine.enable(MonsterSystem);
+        engine.enable(InGameSystem);
+        // engine.disable(MenuSystem);
     }
 
     static public function update(dt:Float) {

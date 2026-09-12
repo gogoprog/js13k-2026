@@ -91,6 +91,8 @@ class World {
 
     inline static public function setCamera(position:math.Vector3, yaw:Float, pitch:Float) {
         var p = position * scale;
+        var fx = Math.sin(yaw);
+        var fz = Math.cos(yaw);
         W.camera({
             x:p.x,
             y:p.y,

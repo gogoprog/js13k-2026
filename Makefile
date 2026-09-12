@@ -37,5 +37,22 @@ zip: retail
 	cd retail && zip ../retail.zip -r .
 	stat retail.zip | grep Size
 
+run:
+	DISPLAY=:1 xdotool keydown F5
+	sleep 0.1
+	DISPLAY=:1 xdotool keyup F5
+	sleep 0.1
+
+screenshot:
+	sleep 0.5
+	export DISPLAY=:1 && maim -i `xdotool search --onlyvisible --name Firefox` ./screenshot_full.png && magick ./screenshot_full.png -resize 640x480 ./screenshot.png
+
+key:
+	DISPLAY=:1 xdotool keydown $(KEY)
+	sleep 0.1
+	DISPLAY=:1 xdotool keyup $(KEY)
+	sleep 0.1
+
+
 
 .PHONY: build retail
