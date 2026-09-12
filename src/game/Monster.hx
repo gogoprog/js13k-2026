@@ -1,6 +1,6 @@
 package game;
 
-class Ball {
+class Monster {
     public var hp = 4;
     public var targetYaw:Float = 0;
 }

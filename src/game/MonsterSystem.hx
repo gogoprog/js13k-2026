@@ -2,16 +2,16 @@ package game;
 
 import ecs.Engine;
 
-class BallSystem extends ecs.System {
+class MonsterSystem extends ecs.System {
     private var turnSpeed = 180.0;
 
     public function new() {
         super();
-        requires(Ball);
+        requires(Monster);
     }
 
     override public function updateEntity(e:ecs.Entity, dt:Float) {
-        var ball = e.get(Ball);
+        var m = e.get(Monster);
         var move = e.get(Move);
 
         if(move == null) {
@@ -21,10 +21,10 @@ class BallSystem extends ecs.System {
             var speed = 2;
             var angle = Math.random() * 3.14 * 2;
             move.velocity = math.Vector3.getRotatedAroundY([1, 0, 0], angle) * speed;
-            ball.targetYaw = -angle * 180 / 3.14 + 90;
+            m.targetYaw = -angle * 180 / 3.14 + 90;
         }
 
-        e.yaw = rotateTowards(e.yaw, ball.targetYaw, turnSpeed, dt);
+        e.yaw = rotateTowards(e.yaw, m.targetYaw, turnSpeed, dt);
     }
 
     static inline function rotateTowards(current:Float, target:Float, speed:Float, dt:Float):Float {

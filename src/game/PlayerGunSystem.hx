@@ -55,14 +55,14 @@ class PlayerGunSystem extends ecs.System {
         var origin = e.position;
         var targ = origin + direction * 10;
 
-        for(b in engine.getSystem(BallSystem).entities) {
+        for(b in engine.getSystem(MonsterSystem).entities) {
             if(raySphereIntersection(origin, direction, b.position, 0.5) != null) {
-                var ball = b.get(Ball);
-                ball.hp--;
+                var m = b.get(Monster);
+                m.hp--;
 
                 Game.spawnParticles(b.position, 16);
 
-                if(ball.hp <= 0) {
+                if(m.hp <= 0) {
                     engine.remove(b);
                     Audio.sfx(1.1, .05, 53, .05, .29, .33, 0, 2, 7, 0, 0, 0, 0, 2, 0, .9, 0, .32, .14, 0, 0);
                 }

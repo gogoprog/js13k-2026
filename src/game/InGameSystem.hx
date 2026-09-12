@@ -44,9 +44,8 @@ class InGameSystem extends ecs.System {
 
                 for(i in 0...6) {
                     var e = new ecs.Entity();
-                    e.add(Ball);
+                    e.add(Monster);
                     e.add(Model);
-                    // e.get(Model).offset.y = -1.0;
                     var pos = zone.getCenter();
                     e.position = [pos.x, 0.0, pos.y];
                     e.scale = 0.1;

@@ -21,7 +21,7 @@ class MenuSystem extends ecs.System {
         if(Input.isMouseJustDown()) {
             engine.enable(PlayerSystem);
             engine.enable(PlayerGunSystem);
-            engine.enable(BallSystem);
+            engine.enable(MonsterSystem);
             engine.enable(InGameSystem);
             engine.disable(MenuSystem);
         }
